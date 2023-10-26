@@ -14,7 +14,10 @@ func routes() http.Handler {
 // Just a simple example of a handler.
 func helloWorld() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world"))
+		if _,err := w.Write([]byte("Hello world")); err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 	}
 }

@@ -15,7 +15,7 @@ import (
 
 // Variables injected at compile time.
 var (
-	appName = "app"
+	appName = "No name provided"
 	version = "No version provided"
 )
 
