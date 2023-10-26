@@ -1,3 +1,9 @@
 **/.DS_Store
 **/*.bin
 artifacts/
+*.tfvars
+.terraformrc
+terraform.rc
+*.terraform/
+*.terraform.lock.hcl
+*.tfplan

@@ -13,7 +13,10 @@ GOARCH=amd64
 K8S_CONTEXT=your_context
 K8S_NAMESPACE=your_namespace
 
-ARTIFACTS=artifacts
+ARTIFACTS=./artifacts
+
+clean:
+	rm -rf $(ARTIFACTS)
 
 # ------------------------------------- Go -------------------------------------
 run:
@@ -76,3 +79,18 @@ k8s-apply:
 # 	K8S_CONTEXT=$(K8S_CONTEXT) \
 # 	K8S_NAMESPACE=$(K8S_NAMESPACE) \
 # 		./scripts/delete.sh
+
+# --------------------------------- Terraform ----------------------------------
+terraform-init:
+	terraform -chdir=deployments/terraform/ init
+
+# Terraform variables can be added as environment variables. Eg:
+# TF_VAR_var_name=$(YOUR_VARIABLE)
+terraform-plan:
+	terraform -chdir=deployments/terraform/ plan -out=plan.tfplan
+
+terraform-apply:
+	terraform -chdir=deployments/terraform/ apply plan.tfplan
+
+terraform-destroy:
+	terraform -chdir=deployments/terraform/ destroy
