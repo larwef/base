@@ -67,7 +67,7 @@ COPY --from=base /etc/passwd /etc/passwd
 # build and lint stage can then be run in parallell.
 COPY --from=lint /tmp/dummy.txt /tmp/dummy.txt 
 
-COPY --from=build /app.bin /app
+COPY --from=build /app/app.bin /app
 
 USER 10001
 

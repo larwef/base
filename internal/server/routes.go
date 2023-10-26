@@ -18,6 +18,5 @@ func helloWorld() http.HandlerFunc {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 	}
 }

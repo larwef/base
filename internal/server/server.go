@@ -49,6 +49,11 @@ func (s *Server) ListenAndServeContext(ctx context.Context) error {
 
 	s.logger.Info("starting server")
 	errCh := make(chan error)
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil {
+			errCh <- err
+		}
+	}()
 
 	select {
 	case <-ctx.Done():
