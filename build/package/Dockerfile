@@ -58,6 +58,8 @@ RUN make build
 # ----------------------------------- Final -----------------------------------
 FROM scratch as final
 
+ARG artifacts
+
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=base /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=base /etc/passwd /etc/passwd
@@ -67,7 +69,7 @@ COPY --from=base /etc/passwd /etc/passwd
 # build and lint stage can then be run in parallell.
 COPY --from=lint /tmp/dummy.txt /tmp/dummy.txt 
 
-COPY --from=build /app/app.bin /app
+COPY --from=build /app/${artifacts}/app.bin /app
 
 USER 10001
 
