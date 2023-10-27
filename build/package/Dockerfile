@@ -12,16 +12,11 @@ RUN apk add --no-cache make
 WORKDIR /app
 
 COPY Makefile .
+COPY config.env* .
 
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-
-COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
-COPY internal/ internal/
-
-RUN make test
-RUN make build
 
 COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
 COPY internal/ internal/
@@ -38,6 +33,7 @@ RUN apk add --no-cache make
 WORKDIR /app
 
 COPY Makefile .
+COPY config.env* .
 
 COPY go.mod .
 COPY go.sum .
