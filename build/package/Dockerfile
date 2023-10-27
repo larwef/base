@@ -1,9 +1,3 @@
-# ------------------------------------ Base ------------------------------------
-FROM alpine:3.18 as base
-RUN apk add --no-cache ca-certificates
-RUN apk add --no-cache tzdata
-RUN adduser -S -u 10001 scratchuser
-
 # ------------------------------------ Lint ------------------------------------
 FROM golangci/golangci-lint:v1.55-alpine as lint
 
@@ -56,21 +50,17 @@ RUN make test
 RUN make build
 
 # ----------------------------------- Final -----------------------------------
-FROM scratch as final
+# Using this instead of scratch with CA certificates and tzdata. This is slightly
+# bigger (about 1MB) but makes for a cleaner setup.
+FROM gcr.io/distroless/static-debian12:nonroot AS final
 
 ARG artifacts
-
-COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=base /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=base /etc/passwd /etc/passwd
 
 # Creating and copying a dummy file to avoid buildkit skipping this stage.
 # The reason for copying the file here, in stead of the build stage, is that the
 # build and lint stage can then be run in parallell.
 COPY --from=lint /tmp/dummy.txt /tmp/dummy.txt 
 
-COPY --from=build /app/${artifacts}/app.bin /app
-
-USER 10001
+COPY --from=build --chown=nonroot:nonroot /app/${artifacts}/app.bin /app
 
 ENTRYPOINT ["/app"]
