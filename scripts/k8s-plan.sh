@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+mkdir -p "$(dirname "$MANIFEST_OUTPUT")"
+
 kustomize build deployments/kubernetes | envsubst >"$MANIFEST_OUTPUT"
 # To avoid failing when there is a diff.
 set +e
