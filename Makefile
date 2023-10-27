@@ -1,3 +1,7 @@
+# TODO: Uncomment if using a seperate file for envronemtn variables you don't
+# want to disclose.
+# include config.env
+
 # TODO: Change name. Remember to also change the name of cmd/app/.
 APP_NAME=app
 VERSION=v0.0.1

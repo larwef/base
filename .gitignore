@@ -7,3 +7,4 @@ terraform.rc
 *.terraform/
 *.terraform.lock.hcl
 *.tfplan
+config.env
