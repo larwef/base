@@ -76,13 +76,15 @@ k8s-plan:
 k8s-apply:
 	K8S_CONTEXT=$(K8S_CONTEXT) \
 	K8S_NAMESPACE=$(K8S_NAMESPACE) \
+	MANIFEST_INPUT=$(ARTIFACTS)/k8s-manifest.yaml \
 		./scripts/k8s-apply.sh
 
 # Included for completeness. Commented for safety.
-# kubernetes-delete:
+# k8s-delete:
 # 	K8S_CONTEXT=$(K8S_CONTEXT) \
 # 	K8S_NAMESPACE=$(K8S_NAMESPACE) \
-# 		./scripts/delete.sh
+#	MANIFEST_INPUT=$(ARTIFACTS)/k8s-manifest.yaml \
+# 		./scripts/k8s-delete.sh
 
 # --------------------------------- Terraform ----------------------------------
 terraform-init:
