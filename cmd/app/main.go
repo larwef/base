@@ -10,6 +10,7 @@ import (
 	"log/slog"
 
 	"github.com/kelseyhightower/envconfig"
+	"github.com/larwef/base/internal/handler"
 	"github.com/larwef/base/internal/server"
 )
 
@@ -47,7 +48,7 @@ func realMain(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	srv := server.New(conf.Addr, server.WithLogger(logger))
+	srv := server.New(conf.Addr, handler.Routes(), server.WithLogger(logger))
 
 	return srv.ListenAndServeContext(ctx)
 }

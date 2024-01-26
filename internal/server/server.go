@@ -15,11 +15,11 @@ type Server struct {
 
 type ServerOption func(*Server)
 
-func New(address string, options ...ServerOption) *Server {
+func New(address string, handler http.Handler, options ...ServerOption) *Server {
 	s := &Server{
 		srv: &http.Server{
 			Addr:         address,
-			Handler:      routes(),
+			Handler:      handler,
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 5 * time.Second,
 		},
