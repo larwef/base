@@ -24,6 +24,7 @@ clean:
 
 # ------------------------------------- Go -------------------------------------
 run:
+	make generate
 	go run cmd/app/main.go
 
 .PHONY: lint
@@ -43,6 +44,10 @@ build:
 			-X main.appName=$(APP_NAME) \
     		-X main.version=$(VERSION) \
     	" -o $(ARTIFACTS)/app.bin cmd/$(APP_NAME)/main.go
+
+.PHONY: generate
+generate:
+	go generate ./...
 
 # ----------------------------------- Docker -----------------------------------
 docker-build:
