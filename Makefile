@@ -25,7 +25,9 @@ clean:
 # ------------------------------------- Go -------------------------------------
 run:
 	make generate
-	go run cmd/app/main.go
+	LOG_LEVEL=debug \
+	LOG_JSON=false \
+		go run cmd/app/main.go
 
 .PHONY: lint
 lint:

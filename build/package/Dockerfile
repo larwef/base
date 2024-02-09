@@ -23,6 +23,9 @@ COPY internal/ internal/
 
 RUN make lint
 
+# -------------------------------- License Check -------------------------------
+# TODO: Add license check (https://github.com/google/go-licenses)
+
 # ------------------------------------ Build -----------------------------------
 FROM golang:1.21-alpine as build
 

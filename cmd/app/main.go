@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,19 +22,38 @@ var (
 )
 
 type Config struct {
+	LogLvl    slog.Level `envconfig:"LOG_LEVEL" default:"info"`
+	LogSource bool       `envconfig:"LOG_SOURCE"`
+	LogJSON   bool       `envconfig:"LOG_JSON" default:"true"`
+
 	Addr string `envconfig:"ADDRESS" default:":8080"`
 }
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-	})).With(slog.Group("application", "name", appName, "version", version))
+	var conf Config
+	if err := envconfig.Process("", &conf); err != nil {
+		log.Fatalf("failed to load configuration: %v", err)
+	}
+
+	// Set the default slog logger in stead of passing it around.
+	logHandlerOpts := &slog.HandlerOptions{
+		Level:     conf.LogLvl,
+		AddSource: conf.LogSource,
+	}
+
+	var logHandler slog.Handler
+	if conf.LogJSON {
+		logHandler = slog.NewJSONHandler(os.Stdout, logHandlerOpts)
+	} else {
+		logHandler = slog.NewTextHandler(os.Stdout, logHandlerOpts)
+	}
+	logger := slog.
+		New(logHandler).
+		With(slog.Group("application", "name", appName, "version", version))
 	slog.SetDefault(logger)
 
-	logger.Info("starting application")
-
 	ctx, done := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := realMain(ctx, logger)
+	err := realMain(ctx, conf)
 	done()
 	if err != nil && !errors.Is(err, context.Canceled) {
 		logger.Error("program finished with error", "error", err)
@@ -42,13 +62,8 @@ func main() {
 	}
 }
 
-func realMain(ctx context.Context, logger *slog.Logger) error {
-	var conf Config
-	if err := envconfig.Process("", &conf); err != nil {
-		return err
-	}
-
-	srv := server.New(conf.Addr, handler.Routes(), server.WithLogger(logger))
-
+func realMain(ctx context.Context, conf Config) error {
+	slog.Info("starting application")
+	srv := server.New(conf.Addr, handler.Routes())
 	return srv.ListenAndServeContext(ctx)
 }
