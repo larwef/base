@@ -47,6 +47,9 @@ build:
 generate:
 	go generate ./...
 
+.PHONY: update
+update:
+	go get -u ./...
 # ----------------------------------- Docker -----------------------------------
 docker-build:
 	docker build -t $(REGISTRY)/$(APP_NAME):$(VERSION) \
