@@ -13,10 +13,6 @@ REGISTRY=your.registry/name
 GOOS=linux
 GOARCH=amd64
 
-# TODO: Change to match your Kubernetes setup.
-K8S_CONTEXT=your_context
-K8S_NAMESPACE=your_namespace
-
 ARTIFACTS=./artifacts
 
 clean:
@@ -67,43 +63,3 @@ docker-run:
 
 docker-push:
 	docker push $(REGISTRY)/$(APP_NAME):$(VERSION)
-
-# --------------------------------- Kubernetes ---------------------------------
-# Remmeber to add more variables here if you add more to be susbtituted in the
-# manifest templates.
-k8s-plan:
-	APP_NAME=$(APP_NAME) \
-	VERSION=$(VERSION) \
-	REGISTRY=$(REGISTRY) \
-	K8S_CONTEXT=$(K8S_CONTEXT) \
-	K8S_NAMESPACE=$(K8S_NAMESPACE) \
-	MANIFEST_OUTPUT=$(ARTIFACTS)/k8s-manifest.yaml \
-		./scripts/k8s-plan.sh
-
-k8s-apply:
-	K8S_CONTEXT=$(K8S_CONTEXT) \
-	K8S_NAMESPACE=$(K8S_NAMESPACE) \
-	MANIFEST_INPUT=$(ARTIFACTS)/k8s-manifest.yaml \
-		./scripts/k8s-apply.sh
-
-# Included for completeness. Commented for safety.
-# k8s-delete:
-# 	K8S_CONTEXT=$(K8S_CONTEXT) \
-# 	K8S_NAMESPACE=$(K8S_NAMESPACE) \
-#	MANIFEST_INPUT=$(ARTIFACTS)/k8s-manifest.yaml \
-# 		./scripts/k8s-delete.sh
-
-# --------------------------------- Terraform ----------------------------------
-terraform-init:
-	terraform -chdir=deployments/terraform/ init
-
-# Terraform variables can be added as environment variables. Eg:
-# TF_VAR_var_name=$(YOUR_VARIABLE)
-terraform-plan:
-	terraform -chdir=deployments/terraform/ plan -out=plan.tfplan
-
-terraform-apply:
-	terraform -chdir=deployments/terraform/ apply plan.tfplan
-
-terraform-destroy:
-	terraform -chdir=deployments/terraform/ destroy
