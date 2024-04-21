@@ -52,6 +52,9 @@ update:
 	go get -u ./...
 	go mod tidy
 
+license-check:
+	go-licenses check ./... --disallowed_types=forbidden -v 1
+
 # ----------------------------------- Docker -----------------------------------
 docker-build:
 	docker build -t $(REGISTRY)/$(APP_NAME):$(VERSION) \

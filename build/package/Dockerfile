@@ -5,7 +5,7 @@ ARG app_name
 
 # Buildkit will skip stages the final image doesn't depend on.
 # Creating and copying a dummy file to avoid buildkit skipping this stage.
-RUN echo "Dummy" > /tmp/dummy.txt
+RUN echo "Dummy" > /tmp/lint-dummy.txt
 
 RUN apk add --no-cache make
 
@@ -24,7 +24,29 @@ COPY internal/ internal/
 RUN make lint
 
 # -------------------------------- License Check -------------------------------
-# TODO: Add license check (https://github.com/google/go-licenses)
+FROM golang:1.22-alpine as license
+
+ARG app_name
+
+RUN echo "Dummy" > /tmp/license-dummy.txt
+
+RUN apk add --no-cache make
+
+RUN go install github.com/google/go-licenses@latest
+
+WORKDIR /app
+
+COPY Makefile .
+COPY config.env* .
+
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
+COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
+COPY internal/ internal/
+
+RUN make license-check
 
 # ------------------------------------ Build -----------------------------------
 FROM golang:1.22-alpine as build
@@ -58,7 +80,8 @@ ARG artifacts
 # Creating and copying a dummy file to avoid buildkit skipping this stage.
 # The reason for copying the file here, in stead of the build stage, is that the
 # build and lint stage can then be run in parallell.
-COPY --from=lint /tmp/dummy.txt /tmp/dummy.txt 
+COPY --from=lint /tmp/lint-dummy.txt /tmp/lint-dummy.txt 
+COPY --from=license /tmp/license-dummy.txt /tmp/license-dummy.txt 
 
 COPY --from=build --chown=nonroot:nonroot /app/${artifacts}/app.bin /app
 
