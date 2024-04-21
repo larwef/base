@@ -1,5 +1,5 @@
 # ------------------------------------ Lint ------------------------------------
-FROM golangci/golangci-lint:v1.55-alpine as lint
+FROM golangci/golangci-lint:v1.57-alpine as lint
 
 ARG app_name
 
@@ -27,7 +27,7 @@ RUN make lint
 # TODO: Add license check (https://github.com/google/go-licenses)
 
 # ------------------------------------ Build -----------------------------------
-FROM golang:1.21-alpine as build
+FROM golang:1.22-alpine as build
 
 ARG app_name
 

@@ -50,6 +50,8 @@ generate:
 .PHONY: update
 update:
 	go get -u ./...
+	go mod tidy
+
 # ----------------------------------- Docker -----------------------------------
 docker-build:
 	docker build -t $(REGISTRY)/$(APP_NAME):$(VERSION) \
