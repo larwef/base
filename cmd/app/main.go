@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"log/slog"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/larwef/base/internal/handler"
@@ -26,7 +25,7 @@ type Config struct {
 	LogSource bool       `envconfig:"LOG_SOURCE"`
 	LogJSON   bool       `envconfig:"LOG_JSON" default:"true"`
 
-	Addr string `envconfig:"ADDRESS" default:":8080"`
+	ServerConfig server.Config
 }
 
 func main() {
@@ -64,6 +63,6 @@ func main() {
 
 func realMain(ctx context.Context, conf Config) error {
 	slog.Info("starting application")
-	srv := server.New(conf.Addr, handler.Routes())
+	srv := server.New(conf.ServerConfig, handler.Routes())
 	return srv.ListenAndServeContext(ctx)
 }

@@ -23,7 +23,7 @@ run:
 	make generate
 	LOG_LEVEL=debug \
 	LOG_JSON=false \
-		go run cmd/app/main.go
+		go run cmd/$(APP_NAME)/main.go
 
 .PHONY: lint
 lint:

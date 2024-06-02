@@ -12,7 +12,7 @@ RUN apk add --no-cache make
 WORKDIR /app
 
 COPY Makefile .
-COPY config.env* .
+COPY config.env .
 
 COPY go.mod .
 COPY go.sum .

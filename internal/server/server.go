@@ -7,15 +7,19 @@ import (
 	"time"
 )
 
+type Config struct {
+	Addr string `envconfig:"ADDRESS" default:":8080"`
+}
+
 // Wrapper around http.Server to avoid cluttering up the main function.
 type Server struct {
 	srv *http.Server
 }
 
-func New(address string, handler http.Handler) *Server {
+func New(conf Config, handler http.Handler) *Server {
 	s := &Server{
 		srv: &http.Server{
-			Addr:         address,
+			Addr:         conf.Addr,
 			Handler:      handler,
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 5 * time.Second,
