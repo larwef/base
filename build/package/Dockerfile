@@ -1,3 +1,4 @@
+
 # ------------------------------------ Lint ------------------------------------
 FROM golangci/golangci-lint:v1.57-alpine as lint
 
@@ -7,12 +8,12 @@ ARG app_name
 # Creating and copying a dummy file to avoid buildkit skipping this stage.
 RUN echo "Dummy" > /tmp/lint-dummy.txt
 
-RUN apk add --no-cache make
+RUN go install github.com/go-task/task/v3/cmd/task@latest
 
 WORKDIR /app
 
-COPY Makefile .
-COPY config.env .
+COPY Taskfile.yaml .
+COPY config.env* .
 
 COPY go.mod .
 COPY go.sum .
@@ -21,7 +22,7 @@ RUN go mod download
 COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
 COPY internal/ internal/
 
-RUN make lint
+RUN task go:lint
 
 # -------------------------------- License Check -------------------------------
 FROM golang:1.22-alpine as license
@@ -30,13 +31,13 @@ ARG app_name
 
 RUN echo "Dummy" > /tmp/license-dummy.txt
 
-RUN apk add --no-cache make
+RUN go install github.com/go-task/task/v3/cmd/task@latest
 
 RUN go install github.com/google/go-licenses@latest
 
 WORKDIR /app
 
-COPY Makefile .
+COPY Taskfile.yaml .
 COPY config.env* .
 
 COPY go.mod .
@@ -46,18 +47,18 @@ RUN go mod download
 COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
 COPY internal/ internal/
 
-RUN make license-check
+RUN task go:license-check
 
 # ------------------------------------ Build -----------------------------------
 FROM golang:1.22-alpine as build
 
 ARG app_name
 
-RUN apk add --no-cache make
+RUN go install github.com/go-task/task/v3/cmd/task@latest
 
 WORKDIR /app
 
-COPY Makefile .
+COPY Taskfile.yaml .
 COPY config.env* .
 
 COPY go.mod .
@@ -67,8 +68,8 @@ RUN go mod download
 COPY cmd/${app_name}/main.go cmd/${app_name}/main.go
 COPY internal/ internal/
 
-RUN make test
-RUN make build
+RUN task go:test
+RUN task go:build
 
 # ----------------------------------- Final -----------------------------------
 # Using this instead of scratch with CA certificates and tzdata. This is slightly
