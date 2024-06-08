@@ -13,10 +13,11 @@ tasks:
   # ------------------------------------ Go ------------------------------------
   go:run:
     cmds:
-      - |
-        LOG_LEVEL=debug \
-        LOG_JSON=false \
-          go run cmd/$APP_NAME/main.go
+      - go run cmd/{{.APP_NAME}}/main.go
+    env:
+      # Additions or overrides of variables from global env and env files.
+      LOG_LEVEL: "debug"
+      LOG_JSON: "false"
 
   go:lint:
     cmds:
@@ -31,9 +32,9 @@ tasks:
       - |
         go build \
           -ldflags " \
-            -X main.appName=$APP_NAME \
-            -X main.version=$VERSION \
-          " -o $ARTIFACTS/app.bin cmd/$APP_NAME/main.go
+            -X main.appName={{.APP_NAME}} \
+            -X main.version={{.VERSION}} \
+          " -o {{.ARTIFACTS}}/app.bin cmd/{{.APP_NAME}}/main.go
     env:
       # TODO: Change OS and ARCH if neccessary.
       GOOS: "linux"
@@ -56,23 +57,23 @@ tasks:
   docker:build:
     cmds:
       - |
-        docker build -t $REGISTRY/$APP_NAME:$VERSION \
-          --build-arg app_name=$APP_NAME \
-          --build-arg artifacts=$ARTIFACTS \
+        docker build -t {{.REGISTRY}}/{{.APP_NAME}}:{{.VERSION}} \
+          --build-arg app_name={{.APP_NAME}} \
+          --build-arg artifacts={{.ARTIFACTS}} \
           -f ./build/package/Dockerfile .
 
   docker:run:
     cmds:
       - |
         docker run -it --rm \
-          --name $APP_NAME \
+          --name {{.APP_NAME}} \
           --env=ADDRESS=:8080 \
           -p 8080:8080 \
-          $REGISTRY/$APP_NAME:$VERSION
+          {{.REGISTRY}}/{{.APP_NAME}}:{{.VERSION}}
 
   docker:push:
     cmds:
-      - docker push $REGISTRY/$APP_NAME:$VERSION
+      - docker push {{.REGISTRY}}/{{.APP_NAME}}:{{.VERSION}}
 
   default:
     desc: "Default task"
