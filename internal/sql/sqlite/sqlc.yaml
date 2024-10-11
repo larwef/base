@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "./queries"
+    schema: "./schema"
+    gen:
+      go:
+        package: "gen"
+        out: "./gen"
+    strict_function_checks: true

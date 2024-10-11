@@ -9,8 +9,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/larwef/base/internal/sql/gen"
-	"github.com/larwef/base/internal/sql/schema"
+	"github.com/larwef/base/internal/sql/postgres/gen"
+	"github.com/larwef/base/internal/sql/postgres/schema"
 	migrate "github.com/rubenv/sql-migrate"
 )
 

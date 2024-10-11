@@ -21,7 +21,7 @@ tasks:
 
   go:lint:
     cmds:
-      - golangci-lint run ./...
+      - golangci-lint --timeout=120s run ./...
 
   go:test:
     cmds:
