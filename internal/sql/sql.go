@@ -22,11 +22,12 @@ type Config struct {
 }
 
 type Postgres struct {
-	db *pgxpool.Pool
-	q  *gen.Queries
+	logger *slog.Logger
+	db     *pgxpool.Pool
+	q      *gen.Queries
 }
 
-func NewPostgres(ctx context.Context, conf Config) (*Postgres, error) {
+func NewPostgres(ctx context.Context, logger *slog.Logger, conf Config) (*Postgres, error) {
 	dbConf, err := pgxpool.ParseConfig(conf.DBConnectionString)
 	if err != nil {
 		return nil, err
@@ -37,8 +38,9 @@ func NewPostgres(ctx context.Context, conf Config) (*Postgres, error) {
 		return nil, err
 	}
 	pg := &Postgres{
-		db: db,
-		q:  gen.New(db),
+		logger: logger,
+		db:     db,
+		q:      gen.New(db),
 	}
 	if err := pg.pingRetry(ctx, conf.PingInterval, conf.PingTimeout); err != nil {
 		return nil, err
@@ -49,19 +51,19 @@ func NewPostgres(ctx context.Context, conf Config) (*Postgres, error) {
 	return pg, nil
 }
 
-func (p *Postgres) Close() {
-	p.db.Close()
+func (pg *Postgres) Close() {
+	pg.db.Close()
 }
 
-func (p *Postgres) pingRetry(ctx context.Context, pingInterval, timeout time.Duration) error {
+func (pg *Postgres) pingRetry(ctx context.Context, pingInterval, timeout time.Duration) error {
 	ticker := time.NewTicker(pingInterval)
 	defer ticker.Stop()
 	timeoutExceeded := time.After(timeout)
 	for {
-		if err := p.db.Ping(ctx); err == nil {
+		if err := pg.db.Ping(ctx); err == nil {
 			return nil
 		} else {
-			slog.Info(fmt.Sprintf("connecting to db failed: %v. Retrying in %s", err, pingInterval))
+			pg.logger.Info(fmt.Sprintf("connecting to db failed: %v. Retrying in %s", err, pingInterval))
 		}
 		select {
 		case <-ctx.Done():
@@ -84,6 +86,6 @@ func (pg *Postgres) migrateUp() error {
 	if err != nil {
 		return err
 	}
-	slog.Info(fmt.Sprintf("database migration: %d migrations applied up\n", n))
+	pg.logger.Info(fmt.Sprintf("database migration: %d migrations applied up\n", n))
 	return nil
 }

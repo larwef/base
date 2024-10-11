@@ -49,10 +49,9 @@ func main() {
 	logger := slog.
 		New(logHandler).
 		With(slog.Group("application", "name", appName, "version", version))
-	slog.SetDefault(logger)
 
 	ctx, done := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := realMain(ctx, conf)
+	err := realMain(ctx, conf, logger)
 	done()
 	if err != nil && !errors.Is(err, context.Canceled) {
 		logger.Error("program finished with error", "error", err)
@@ -61,8 +60,8 @@ func main() {
 	}
 }
 
-func realMain(ctx context.Context, conf Config) error {
-	slog.Info("starting application")
-	srv := server.New(conf.ServerConfig, handler.Routes())
+func realMain(ctx context.Context, conf Config, logger *slog.Logger) error {
+	logger.Info("starting application")
+	srv := server.New(logger.With(slog.String("component", "server")), conf.ServerConfig, handler.Routes())
 	return srv.ListenAndServeContext(ctx)
 }
