@@ -1,5 +1,5 @@
 # ------------------------------------ Lint ------------------------------------
-FROM golangci/golangci-lint:v1.61-alpine as lint
+FROM golangci/golangci-lint:v1.61-alpine AS lint 
 
 ARG app_name
 
@@ -24,7 +24,7 @@ COPY internal/ internal/
 RUN task go:lint
 
 # -------------------------------- License Check -------------------------------
-FROM golang:1.23-alpine as license
+FROM golang:1.23-alpine AS license
 
 ARG app_name
 
@@ -49,7 +49,7 @@ COPY internal/ internal/
 RUN task go:license-check
 
 # ------------------------------------ Build -----------------------------------
-FROM golang:1.23-alpine as build
+FROM golang:1.23-alpine AS build
 
 ARG app_name
 
